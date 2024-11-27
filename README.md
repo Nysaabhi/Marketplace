@@ -639,162 +639,305 @@ function showProductDetails(productId) {
         <div class="modal-content product-details">
             <div class="product-details-header">
                 <h2>${product.name}</h2>
-                <button class="close-button" onclick="closeProductDetails()">
+                <button class="close-button" aria-label="Close">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="product-details-body">
-                <div class="product-details-carousel">
-                    ${product.images.map((img, index) => `
-                        <div class="carousel-item ${index === 0 ? 'active' : ''}">
-                            <img src="${img}" alt="${product.name}">
-                        </div>
-                    `).join('')}
-                    <div class="carousel-controls">
-                        ${product.images.map((_, index) => `
-                            <span class="carousel-dot ${index === 0 ? 'active' : ''}" 
-                                  onclick="changeModalCarouselSlide(${index})"></span>
-                        `).join('')}
-                    </div>
+                <div class="product-image">
+                    <img src="${product.images[0]}" alt="${product.name}" class="main-product-image">
                 </div>
                 <div class="product-details-info">
                     <div class="product-brand">${product.brand}</div>
-                    <div class="product-price">₹${product.price}</div>
+                    <div class="product-price">₹${product.price.toLocaleString()}</div>
+                    
                     <p class="product-description">${product.description}</p>
                     
                     <div class="product-features">
-                        <h3>Features</h3>
+                        <h3>Key Features</h3>
                         <ul>
                             ${product.features.map(feature => `<li>${feature}</li>`).join('')}
                         </ul>
                     </div>
                     
                     <div class="product-specs">
-                        <h3>Specifications</h3>
+                        <h3>Technical Specifications</h3>
                         <table>
                             ${Object.entries(product.specs).map(([key, value]) => `
                                 <tr>
-                                    <td>${key.charAt(0).toUpperCase() + key.slice(1)}</td>
-                                    <td>${Array.isArray(value) ? value.join(', ') : value}</td>
+                                    <td class="spec-key">${key.charAt(0).toUpperCase() + key.slice(1)}</td>
+                                    <td class="spec-value">${Array.isArray(value) ? value.join(', ') : value}</td>
                                 </tr>
                             `).join('')}
                         </table>
                     </div>
                     
                     <div class="product-quantity">
-                        <label>Quantity:</label>
+                        <label for="quantity-${productId}">Quantity:</label>
                         <div class="quantity-control">
-                            <button onclick="changeQuantity('${productId}', -1)">-</button>
-                            <input type="number" id="quantity-${productId}" value="1" min="1">
-                            <button onclick="changeQuantity('${productId}', 1)">+</button>
+                            <button aria-label="Decrease quantity" onclick="changeQuantity('${productId}', -1)">-</button>
+                            <input type="number" id="quantity-${productId}" value="1" min="1" max="10">
+                            <button aria-label="Increase quantity" onclick="changeQuantity('${productId}', 1)">+</button>
                         </div>
                     </div>
                     
-                    <button class="action-button order-button" onclick="proceedToOrder('${productId}')">Order Now</button>
+                    <div class="action-buttons">
+                        <button class="action-button cart-button" onclick="addToCart('${productId}')">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                        <button class="action-button order-button" onclick="proceedToOrder('${productId}')">
+                            <i class="fas fa-bolt"></i> Buy Now
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     `;
+
+    // Close modal functionality
+    const closeButton = modal.querySelector('.close-button');
+    closeButton.addEventListener('click', () => {
+        document.body.removeChild(modal);
+    });
+
+    // Close modal when clicking outside
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            document.body.removeChild(modal);
+        }
+    });
 
     document.body.appendChild(modal);
     
     // Add modal styles
     const style = document.createElement('style');
     style.textContent = `
+        :root {
+            --modal-bg-color: #1e1e24;
+            --text-color: #f4f4f4;
+            --primary-color: #ffd700;
+            --secondary-color: #4a4a55;
+        }
+
         .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.7);
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1100;
+            padding: 20px;
+            backdrop-filter: blur(5px);
         }
+
         .modal-content.product-details {
-            background: #1a1a1f;
-            border-radius: 15px;
-            width: 90%;
-            max-width: 1000px;
+            background: var(--modal-bg-color);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 1100px;
             max-height: 90vh;
             overflow-y: auto;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
             position: relative;
+            border: 1px solid rgba(255, 215, 0, 0.1);
         }
+
         .product-details-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 20px;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            border-bottom: 1px solid var(--secondary-color);
         }
+
+        .product-details-header h2 {
+            margin: 0;
+            color: var(--text-color);
+            font-size: 1.5em;
+        }
+
+        .close-button {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .close-button:hover {
+            color: var(--primary-color);
+        }
+
         .product-details-body {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 30px;
+            padding: 30px;
+        }
+
+        .product-image {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #2a2a35;
+            border-radius: 12px;
             padding: 20px;
         }
-        .product-details-carousel {
-            position: relative;
-            height: 400px;
+
+        .main-product-image {
+            max-width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            border-radius: 8px;
         }
+
         .product-details-info {
-            color: #ffffff;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
         }
+
         .product-brand {
             color: var(--primary-color);
             font-size: 1.2em;
             margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
+
         .product-price {
-            font-size: 1.5em;
+            font-size: 2em;
             font-weight: bold;
             color: var(--primary-color);
             margin-bottom: 15px;
         }
+
         .product-description {
             margin-bottom: 20px;
+            line-height: 1.6;
+            color: #b0b0b8;
         }
+
         .product-features, .product-specs {
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
+
+        .product-features h3, .product-specs h3 {
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+        }
+
         .product-features ul {
             padding-left: 20px;
+            list-style-type: none;
         }
+
+        .product-features li::before {
+            content: '✓';
+            color: var(--primary-color);
+            margin-right: 10px;
+        }
+
         .product-specs table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 8px;
+            overflow: hidden;
         }
-        .product-specs table td {
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 10px;
+
+        .product-specs table tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.05);
         }
+
+        .product-specs td {
+            padding: 12px;
+            border: 1px solid var(--secondary-color);
+            color: #b0b0b8;
+        }
+
+        .product-specs .spec-key {
+            font-weight: bold;
+            width: 40%;
+        }
+
         .quantity-control {
             display: flex;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px;
+            background: var(--secondary-color);
+            border-radius: 8px;
+            overflow: hidden;
         }
+
         .quantity-control button {
-            background: var(--primary-color);
+            background: transparent;
             border: none;
-            color: black;
-            padding: 5px 10px;
+            color: var(--text-color);
+            padding: 10px 15px;
             cursor: pointer;
+            transition: background 0.3s ease;
         }
+
+        .quantity-control button:hover {
+            background: rgba(255, 215, 0, 0.2);
+        }
+
         .quantity-control input {
             width: 50px;
             text-align: center;
-            margin: 0 10px;
+            background: transparent;
+            border: none;
+            color: var(--text-color);
+            font-size: 1em;
         }
-        .order-button {
-            width: 100%;
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .action-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .cart-button {
+            background: var(--secondary-color);
+            color: var(--text-color);
+        }
+
+        .order-button {
             background: var(--primary-color);
             color: black;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+        }
+
+        .action-button:hover {
+            transform: translateY(-3px);
+            opacity: 0.9;
+        }
+
+        @media (max-width: 768px) {
+            .product-details-body {
+                grid-template-columns: 1fr;
+            }
         }
     `;
     document.head.appendChild(style);
@@ -803,7 +946,7 @@ function showProductDetails(productId) {
 function changeQuantity(productId, change) {
     const quantityInput = document.getElementById(`quantity-${productId}`);
     let currentQuantity = parseInt(quantityInput.value);
-    currentQuantity = Math.max(1, currentQuantity + change);
+    currentQuantity = Math.max(1, Math.min(10, currentQuantity + change));
     quantityInput.value = currentQuantity;
 }
 
@@ -973,37 +1116,33 @@ function processOrder(product, quantity) {
     const address = document.getElementById('address').value;
     const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked').value;
 
-    // In a real-world scenario, you would send this data to a backend server
-    console.log('Order Details:', {
-        product: product.name,
-        quantity: quantity,
-        totalPrice: product.price * quantity,
-        customerDetails: {
-            fullName,
-            email,
-            phone,
-            address
-        },
-        paymentMethod
-    });
+    // Prepare order details message
+    const orderMessage = `New Order Details:
+
+Product: ${product.name}
+Quantity: ${quantity}
+Total Price: ₹${product.price * quantity}
+
+Customer Information:
+Name: ${fullName}
+Email: ${email}
+Phone: ${phone}
+Address: ${address}
+
+Payment Method: ${paymentMethod}`;
+
+    // Encode the message for URL
+    const encodedMessage = encodeURIComponent(orderMessage);
+
+    // Construct WhatsApp URL (works for WhatsApp Web and mobile)
+    const whatsappUrl = `https://wa.me/917869809022?text=${encodedMessage}`;
+
+    // Open WhatsApp
+    window.open(whatsappUrl, '_blank');
 
     // Simulate order confirmation
-    alert('Order placed successfully! Thank you for your purchase.');
+    alert('Order placed successfully! Redirecting to WhatsApp to send order details.');
     closeOrderModal();
-}
-
-function closeOrderModal() {
-    const orderModal = document.getElementById('orderModal');
-    if (orderModal) {
-        orderModal.remove();
-    }
-}
-
-function closeProductDetails() {
-    const productModal = document.getElementById('productDetailsModal');
-    if (productModal) {
-        productModal.remove();
-    }
 }
 
 function changeModalCarouselSlide(index) {
