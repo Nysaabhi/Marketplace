@@ -277,7 +277,7 @@
             </div>
         
     
-    <nav class="bottom-nav"> <div class="nav-container"> <div class="nav-item" data-page="subscription"> <a href="https://forms.gle/dqu6FvCvTNibQ2WT7"><i class="fas fa-comments"></i></a> <span>Feedback</span> </div> <div class="nav-item" data-page="marketplace"> <a href="marketplace.html"><i class="fas fa-shopping-cart"></i></a> <span>Marketplace</span> </div> <div class="nav-item whatsapp-item" data-page="chat"> <a href="https://wa.me/9111478356" target="_blank"><i class="fas fa-message"></i></a> <span>WhatsApp</span> </div> <div class="nav-item" data-page="location"> <a href="location.html"><i class="fas fa-map-marker-alt"></i></a> <span>Location</span> </div> <div class="nav-item" data-page="listings"> <a href="listings.html"><i class="fas fa-tasks"></i></a> <span>Partner</span> </div> </div> </nav>
+            <nav class="bottom-nav"> <div class="nav-container"> <div class="nav-item" data-page="subscription"> <a href="https://forms.gle/dqu6FvCvTNibQ2WT7"><i class="fas fa-comments"></i></a> <span>Feedback</span> </div> <div class="nav-item" data-page="marketplace"> <a href="marketplace.html"><i class="fas fa-shopping-cart"></i></a> <span>Marketplace</span> </div> <div class="nav-item whatsapp-item" data-page="chat"> <a href="https://wa.me/7869809022" target="_blank"><i class="fas fa-message"></i></a> <span>WhatsApp</span> </div> <div class="nav-item" data-page="location"> <a href="location.html"><i class="fas fa-map-marker-alt"></i></a> <span>Location</span> </div> <div class="nav-item" data-page="listings"> <a href="listings.html"><i class="fas fa-tasks"></i></a> <span>Partner</span> </div> </div> </nav>
     
     <div class="booking-form" id="bookingForm">
         <div class="form-group">
